@@ -5,3 +5,6 @@ logs/
 dist/
 coverage/
 .DS_Store
+.next/
+out/
+.firebase/
