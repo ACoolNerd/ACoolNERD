@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-orange: #FF6A00;
+    --color-orange-dim: #CC5500;
+    --color-orange-glow: #FF8C00;
+
+    --color-surface: #0d0d0d;
+    --color-surface-raised: #111111;
+    --color-surface-border: rgba(255, 106, 0, 0.12);
+
+    --color-text: #f5f5f5;
+    --color-text-muted: #9e9e9e;
+    --color-text-dim: #616161;
+
+    --duration-fast: 150ms;
+    --duration-normal: 300ms;
+    --duration-slow: 600ms;
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
+  }
+
+  ::selection {
+    background-color: rgba(255, 106, 0, 0.25);
+    color: #fff;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0d0d0d;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 106, 0, 0.3);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 106, 0, 0.5);
+  }
+}
+
+@layer components {
+  .chrome-surface {
+    background: radial-gradient(ellipse at 20% 50%, rgba(255,106,0,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(255,106,0,0.03) 0%, transparent 50%),
+                linear-gradient(135deg, #0d0d0d 0%, #111111 50%, #0a0a0a 100%);
+  }
+
+  .orange-rule {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--color-orange) 50%, transparent 100%);
+  }
+
+  .card-surface {
+    background: rgba(17, 17, 17, 0.8);
+    border: 1px solid var(--color-surface-border);
+    backdrop-filter: blur(8px);
+  }
+
+  .text-gradient-orange {
+    background: linear-gradient(135deg, #FF8C00 0%, #FF6A00 60%, #CC5500 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-6 py-3 bg-orange text-white font-semibold text-sm tracking-wide rounded-none transition-all duration-150;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+  .btn-primary:hover {
+    @apply bg-orange-glow;
+    box-shadow: 0 0 24px rgba(255, 106, 0, 0.4);
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-6 py-3 border border-orange/30 text-chrome-100 font-semibold text-sm tracking-wide transition-all duration-150;
+  }
+  .btn-ghost:hover {
+    @apply border-orange/70 text-white;
+    background: rgba(255, 106, 0, 0.06);
+  }
+
+  .section-label {
+    @apply text-xs font-mono uppercase tracking-[0.2em] text-orange;
+  }
+}
