@@ -1,210 +1,104 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import type { FormEvent } from 'react'
+import { useState } from 'react'
 
 const projectTypes = [
   'AI Systems & Automation',
   'Digital Architecture',
   'Civic Technology',
-  'Enterprise Governance',
+  'Technology Governance',
   'Infrastructure & Platform',
-  'Innovation / AR / XR',
   'Other',
 ]
 
 export default function ContactPage() {
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [draftOpened, setDraftOpened] = useState(false)
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setStatus('sending')
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const form = new FormData(event.currentTarget)
+    const name = String(form.get('name') ?? '').trim()
+    const email = String(form.get('email') ?? '').trim()
+    const organization = String(form.get('organization') ?? '').trim()
+    const type = String(form.get('projectType') ?? '').trim()
+    const message = String(form.get('message') ?? '').trim()
+    const subject = encodeURIComponent(`Project inquiry from ${name}`)
+    const body = encodeURIComponent(
+      [`Name: ${name}`, `Email: ${email}`, organization && `Organization: ${organization}`, type && `Project type: ${type}`, '', message]
+        .filter(Boolean)
+        .join('\n'),
+    )
 
-    // Formspree / Netlify / server action can replace this stub
-    await new Promise((r) => setTimeout(r, 1200))
-    setStatus('sent')
+    setDraftOpened(true)
+    window.location.href = `mailto:hello@acoolnerd.com?subject=${subject}&body=${body}`
   }
 
   return (
-    <div className="px-6 py-20">
+    <div className="px-6 py-20 md:py-24">
       <div className="mx-auto max-w-6xl">
-        {/* Header */}
-        <header className="mb-16">
-          <p className="section-label mb-3">Let&apos;s Build</p>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Contact</h1>
-          <div className="orange-rule max-w-xs" />
-          <p className="mt-6 text-chrome-400 max-w-xl leading-relaxed">
-            Whether you have a fully scoped project or just an idea — reach out. I respond within one business day.
+        <header className="mb-14">
+          <p className="section-label mb-3">Start a conversation</p>
+          <h1 className="text-4xl font-semibold tracking-tight text-white md:text-5xl">Contact</h1>
+          <div className="chrome-rule mt-6 max-w-xs" aria-hidden="true" />
+          <p className="mt-6 max-w-xl leading-relaxed text-chrome-400">
+            Share a little about the work you have in mind. Your email app will open a draft that you can review and send.
           </p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
-          {/* Form */}
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-5">
           <div className="lg:col-span-3">
-            {status === 'sent' ? (
-              <div className="card-surface p-10 text-center space-y-4">
-                <div className="w-10 h-10 rounded-full border-2 border-orange flex items-center justify-center mx-auto">
-                  <span className="text-orange text-lg" aria-hidden="true">&#10003;</span>
+            <form onSubmit={handleSubmit} className="space-y-6" aria-label="Prepare an email inquiry">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                  <label htmlFor="name" className="mb-2 block text-xs font-mono uppercase tracking-wider text-chrome-400">Name</label>
+                  <input id="name" name="name" type="text" required autoComplete="name" className="contact-input" />
                 </div>
-                <h2 className="text-xl font-bold text-white">Message received.</h2>
-                <p className="text-sm text-chrome-400">
-                  I&apos;ll get back to you within one business day.
-                </p>
+                <div>
+                  <label htmlFor="email" className="mb-2 block text-xs font-mono uppercase tracking-wider text-chrome-400">Email</label>
+                  <input id="email" name="email" type="email" required autoComplete="email" className="contact-input" />
+                </div>
               </div>
-            ) : (
-              <form
-                onSubmit={handleSubmit}
-                className="space-y-6"
-                aria-label="Contact form"
-                noValidate
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="name" className="block text-xs font-mono text-chrome-400 mb-2 tracking-wider uppercase">
-                      Name <span aria-hidden="true" className="text-orange">*</span>
+
+              <div>
+                <label htmlFor="organization" className="mb-2 block text-xs font-mono uppercase tracking-wider text-chrome-400">Organization <span className="normal-case tracking-normal text-chrome-600">(optional)</span></label>
+                <input id="organization" name="organization" type="text" autoComplete="organization" className="contact-input" />
+              </div>
+
+              <fieldset>
+                <legend className="mb-3 block text-xs font-mono uppercase tracking-wider text-chrome-400">Area of interest <span className="normal-case tracking-normal text-chrome-600">(optional)</span></legend>
+                <div className="flex flex-wrap gap-2">
+                  {projectTypes.map((type) => (
+                    <label key={type} className="cursor-pointer">
+                      <input type="radio" name="projectType" value={type} className="peer sr-only" />
+                      <span className="inline-block border border-white/15 px-3 py-2 text-xs text-chrome-400 transition-colors hover:border-white/40 peer-checked:border-white/70 peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-white">{type}</span>
                     </label>
-                    <input
-                      id="name"
-                      name="name"
-                      type="text"
-                      required
-                      autoComplete="name"
-                      className="w-full bg-chrome-900/50 border border-white/10 focus:border-orange/50 text-chrome-100 text-sm px-4 py-3 outline-none transition-colors duration-150 placeholder:text-chrome-600"
-                      placeholder="Your name"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="email" className="block text-xs font-mono text-chrome-400 mb-2 tracking-wider uppercase">
-                      Email <span aria-hidden="true" className="text-orange">*</span>
-                    </label>
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      required
-                      autoComplete="email"
-                      className="w-full bg-chrome-900/50 border border-white/10 focus:border-orange/50 text-chrome-100 text-sm px-4 py-3 outline-none transition-colors duration-150 placeholder:text-chrome-600"
-                      placeholder="your@email.com"
-                    />
-                  </div>
+                  ))}
                 </div>
+              </fieldset>
 
-                <div>
-                  <label htmlFor="org" className="block text-xs font-mono text-chrome-400 mb-2 tracking-wider uppercase">
-                    Organization
-                  </label>
-                  <input
-                    id="org"
-                    name="organization"
-                    type="text"
-                    autoComplete="organization"
-                    className="w-full bg-chrome-900/50 border border-white/10 focus:border-orange/50 text-chrome-100 text-sm px-4 py-3 outline-none transition-colors duration-150 placeholder:text-chrome-600"
-                    placeholder="Company or org (optional)"
-                  />
-                </div>
+              <div>
+                <label htmlFor="message" className="mb-2 block text-xs font-mono uppercase tracking-wider text-chrome-400">What would you like to work on?</label>
+                <textarea id="message" name="message" required rows={6} className="contact-input resize-y" />
+              </div>
 
-                <fieldset>
-                  <legend className="block text-xs font-mono text-chrome-400 mb-3 tracking-wider uppercase">
-                    Project Type
-                  </legend>
-                  <div className="flex flex-wrap gap-2">
-                    {projectTypes.map((type) => (
-                      <label key={type} className="cursor-pointer">
-                        <input type="radio" name="projectType" value={type} className="sr-only peer" />
-                        <span className="inline-block px-3 py-1.5 text-xs font-mono border border-white/10 text-chrome-400 peer-checked:border-orange peer-checked:text-orange hover:border-white/30 transition-colors duration-150">
-                          {type}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
-
-                <div>
-                  <label htmlFor="message" className="block text-xs font-mono text-chrome-400 mb-2 tracking-wider uppercase">
-                    Message <span aria-hidden="true" className="text-orange">*</span>
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    required
-                    rows={6}
-                    className="w-full bg-chrome-900/50 border border-white/10 focus:border-orange/50 text-chrome-100 text-sm px-4 py-3 outline-none transition-colors duration-150 placeholder:text-chrome-600 resize-y"
-                    placeholder="Tell me about your project, timeline, and goals..."
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={status === 'sending'}
-                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {status === 'sending' ? 'Sending...' : 'Send Message'}
-                </button>
-
-                {status === 'error' && (
-                  <p role="alert" className="text-sm text-red-400">
-                    Something went wrong. Try emailing directly at hello@acoolnerd.com
-                  </p>
-                )}
-              </form>
-            )}
+              <button type="submit" className="btn-primary">Prepare email <span aria-hidden="true">↗</span></button>
+              {draftOpened && <p role="status" className="text-sm text-chrome-300">Your email app should open a draft. The message has not been sent; review it and press Send in your email app.</p>}
+            </form>
           </div>
 
-          {/* Sidebar */}
-          <aside className="lg:col-span-2 space-y-8">
-            <div className="card-surface p-7 space-y-5">
-              <p className="section-label">Direct Contact</p>
-              <dl className="space-y-4">
-                <div>
-                  <dt className="text-xs font-mono text-chrome-600 mb-1">Email</dt>
-                  <dd>
-                    <a
-                      href="mailto:hello@acoolnerd.com"
-                      className="text-sm text-chrome-200 hover:text-orange transition-colors"
-                    >
-                      hello@acoolnerd.com
-                    </a>
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-mono text-chrome-600 mb-1">GitHub</dt>
-                  <dd>
-                    <a
-                      href="https://github.com/acoolnerd"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-chrome-200 hover:text-orange transition-colors"
-                    >
-                      @acoolnerd
-                    </a>
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-mono text-chrome-600 mb-1">Location</dt>
-                  <dd className="text-sm text-chrome-200">Los Angeles, California</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-mono text-chrome-600 mb-1">Response Time</dt>
-                  <dd className="text-sm text-chrome-200">Within 1 business day</dd>
-                </div>
-              </dl>
+          <aside className="space-y-7 lg:col-span-2">
+            <div className="card-surface p-7">
+              <p className="section-label">Direct contact</p>
+              <a href="mailto:hello@acoolnerd.com" className="mt-4 inline-block text-lg text-white underline decoration-white/30 underline-offset-4 hover:decoration-white">hello@acoolnerd.com</a>
+              <p className="mt-4 text-sm leading-relaxed text-chrome-400">Or write directly from your email app. Engagement availability and timing can be confirmed in the reply.</p>
             </div>
-
-            <div className="card-surface p-7 space-y-4">
-              <p className="section-label">Good Fit For</p>
-              <ul className="space-y-2 text-sm text-chrome-400" role="list">
-                {[
-                  'Enterprise technology audits',
-                  'AI system design and integration',
-                  'Civic and nonprofit platforms',
-                  'Multi-entity governance frameworks',
-                  'GCP / Firebase architecture',
-                  'Strategic tech partnerships (CSUN, LA84, city agencies)',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2">
-                    <span className="w-1 h-1 rounded-full bg-orange mt-2 shrink-0" aria-hidden="true" />
-                    {item}
-                  </li>
-                ))}
+            <div className="card-surface p-7">
+              <p className="section-label">A useful first note</p>
+              <ul className="mt-4 space-y-3 text-sm leading-relaxed text-chrome-400">
+                <li>What are you trying to make easier or possible?</li>
+                <li>Who needs to use the system?</li>
+                <li>What is already in place?</li>
               </ul>
             </div>
           </aside>
